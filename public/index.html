@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Studio</title>
+    <style>
+        canvas {
+            border: 1px solid #000;
+            cursor: crosshair;
+        }
+    </style>
+</head>
+<body>
+    <h1>Collaborative Studio</h1>
+    <canvas id="board" width="800" height="600"></canvas>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        const canvas = document.getElementById('board');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        const socket = io();
+
+        canvas.addEventListener('mousedown', (e) => {
+            drawing = true;
+            ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+            ctx.beginPath();
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (drawing) {
+                ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+                ctx.stroke();
+                socket.emit('drawing', { x: e.clientX, y: e.clientY });
+            }
+        });
+
+        socket.on('drawing', (data) => {
+            ctx.lineTo(data.x - canvas.offsetLeft, data.y - canvas.offsetTop);
+            ctx.stroke();
+        });
+    </script>
+</body>
+</html>
