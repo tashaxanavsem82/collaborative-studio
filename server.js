@@ -11,14 +11,14 @@ app.use(cors());
 app.use(express.static('public'));
 
 io.on('connection', (socket) => {
-  console.log('New client connected');
+  console.log(`New client connected: ${socket.id}`);
 
   socket.on('drawing', (data) => {
     socket.broadcast.emit('drawing', data);
   });
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    console.log(`Client disconnected: ${socket.id}`);
   });
 });
 
